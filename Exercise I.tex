@@ -53,19 +53,26 @@
 	
 \usepackage{tikz}
 \usetikzlibrary{arrows}
+
+%LSTListings
+\usepackage{listings}
+\usepackage{tabularx}
+%algorithm
+\usepackage{algorithm}
+\usepackage{algorithmic}
 %%% END Article customizations
 
 %%% The "real" document content comes below...
 
-\title{Brief Article}
-\author{The Author}
+\title{KI sheet}
+\author{Benjamin Binder (1226121)}
 %\date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
 
 \begin{document}
 \maketitle
 
-\section{First section}
+\section{Exercise 1}
 
 \begin{tikzpicture}[scale=.9, transform shape, edge from parent/.style={->, draw}, level 1/.style={sibling distance=40mm}, level 2/.style={sibling distance=20mm}, level 4/.style={sibling distance=10mm}]
 	\tikzstyle{node} = [circle, fill=gray!20]
@@ -101,7 +108,7 @@
 				{
 					node[node]{P} edge from parent node[left]{$5$}
 				}edge from parent node[left]{$4$}
-            		}edge from parent node[left]{$7$}
+            		}edge from parent node[above]{$7$}
     		}
             	child
             	{	
@@ -113,7 +120,7 @@
             			{
             				node[node]{Q}edge from parent node[left]{$3$}
             			}edge from parent node[left]{$7$}
-            		}edge from parent node[left]{$8$}
+            		}edge from parent node[below]{$8$}
             	}
            	child
             	{
@@ -161,7 +168,7 @@
             			{
             				node[node]{U} edge from parent node[left]{$3$}
             			} edge from parent node[left]{$2$}
-            		}
+            		} edge from parent node[below]{$3$}
             	}
             	child
             	{
@@ -169,13 +176,142 @@
             		child
             		{
             			node[node]{M} edge from parent node[left]{$7$}
-            		} edge from parent node[left]{$4$}
+            		} edge from parent node[above]{$4$}
             	}
 	;
 \end{tikzpicture}
 
-\subsection{A subsection}
 
-More text.
+Determine for the following search strategies the order in which the nodes are expanded and the
+corresponding goal node. In case you can expand several nodes and the search strategy does not
+specify the order, choose the nodes in alphabetic sequence. In addition, compute for each search
+strategy the set of nodes that is actually kept in memory when the goal node is found (node A has
+depth zero).
+
+
+
+
+\subsection{Breadth First Search}
+
+Uses a FIFO Queue to queue the Nodes visited. Also there is a explored List to avoid circular searching.
+
+
+\begin{algorithm}
+\caption{breadth-first-search }
+\begin{algorithmic} 
+
+\STATE $node \leftarrow $a node with STATE=problem.INITIAL-STATE
+\STATE PATH-COST = 0
+\IF{ problem.GOAL-TEST(node.STATE)}
+\STATE
+\RETURN node
+\ENDIF
+\STATE $frontier \leftarrow $a FIFO queue with node as the only element
+\STATE $explored \leftarrow $an empty set
+\LOOP
+	\IF {EMPTY?(frontier)}
+		\STATE 
+		\RETURN failure
+	\ENDIF
+	\STATE $node \leftarrow $POP(frontier) /*chooses the shallowest node in frontier */
+	\STATE node.STATE = explored
+	\FOR{\textbf{each} action in problem.ACTIONS(node.STATE) }
+	\STATE $child \leftarrow $CHILD-NODE(problem, node, action)
+	\IF {child.STATE is not in explored or frontier}
+		\IF {problem.GOAL-TEST(child.STATE)}
+			\STATE
+			\RETURN child
+		\ENDIF
+		\STATE $frontier \leftarrow $INSERT(child, frontier)
+	\ENDIF
+	\ENDFOR
+\ENDLOOP
+
+
+\end{algorithmic}
+\end{algorithm}
+\begin{tabularx}{\textwidth}{|r|c|X|X|}
+\hline
+node & frontier & explored  \\
+\hline
+0&A&0\\
+\hline
+A&B, C, D, E, F&0\\
+\hline
+B&C, D, E, F, G, H&A\\
+\hline
+C& D, E, F, G, H, I&A, B\\
+\hline
+...& ...&A, B, ...\\
+\hline
+J&K, L, M, N, O , P, Q&A, B, C, D, E, F, G, H, I\\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|r|c|X|X|}
+\hline
+node & frontier & explored  \\
+\hline
+J&K, L, M, N, O , P, Q&A, B, C, D, E, F, G, H, I\\
+\hline
+...& ...&A, B, ...\\
+\hline
+S&T, U, V, W, X&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R\\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|r|c|X|X|}
+\hline
+node & frontier & explored  \\
+\hline
+S&T, U, V, W, X&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R\\
+\hline
+...& ...&A, B, ...\\
+\hline
+V&W, X, Y, Z&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V\\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|r|c|X|X|}
+\hline
+node & frontier & explored  \\
+\hline
+V&W, X, Y, Z&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V\\
+\hline
+...& ...&A, B, ...\\
+\hline
+X&Y, Z&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V, W\\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|r|c|X|X|}
+\hline
+node & frontier & explored  \\
+\hline
+X&Y, Z&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V, W\\
+\hline
+...& ...&A, B, ...\\
+\hline
+Y&Z&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V, W,X\\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|r|c|X|X|}
+\hline
+node & frontier & explored  \\
+\hline
+Y&Z&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V, W,X\\
+\hline
+...& ...&A, B, ...\\
+\hline
+Z&empty&A, B, C, D, E, F, G, H, I, J, K ,L ,M, N, O, P, Q, R, S, T, U, V, W, X, Y\\
+\hline
+\end{tabularx}
+
+
+\subsection{Uniform Cost Search}
+
+
+
 
 \end{document}
